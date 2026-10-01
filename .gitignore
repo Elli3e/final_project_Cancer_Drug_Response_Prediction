@@ -1,0 +1,27 @@
+# Original large database
+cell_passport_database.db
+
+# Large research datasets
+*.csv
+*.xlsx
+*.parquet
+
+# Keep the app's required files
+!patient_input_template.csv
+!patient_input_template.xlsx
+!20 drugs Pk.csv
+
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environment
+.venv/
+venv/
+
+# Streamlit
+.streamlit/secrets.toml

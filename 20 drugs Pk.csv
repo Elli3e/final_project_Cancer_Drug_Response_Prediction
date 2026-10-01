@@ -1,0 +1,21 @@
+Name,dose,route,Clinical_status,Cmax,Cmax_unit,MW(g/mole),Cmax_M,AUC,AUC_unit,FDA_Approved
+Ulixertinib          ,600 mg BID,Oral,Investigational,2.12,µg/mL,433.3,4.89E-06,19.93,µg·h/mL,yes
+Oxaliplatin       ,85 mg/m²,IV,Approved,0.814,µg/mL,397.29,2.05E-06,8.83*,µg·h/mL*,yes
+Fulvestrant,500 mg + day-15 dose,IM,Approved,28,ng/mL,606.8,4.61E-08,"13,100",ng·h/mL,yes
+Selumetinib,75 mg,Oral,Approved,"1,520",ng/mL,457.7,3.32E-06,"4,510",ng·h/mL,yes
+Dactinomycin         ,500 µg,IV,Approved,99.2,ng/mL,"1,255.40",7.90E-08,4.9,mg/L·min,yes
+Docetaxel            ,115 mg/m²,IV,Approved,~2.41,µg/mL,807.9,2.98E-06,~5.93,µg·h/mL,
+Uprosertib           ,75 mg,Oral,Investigational,409,ng/mL,429.2,9.53E-07,"6,383",ng·h/mL,
+GSK343               ,10 mg/kg,—,Experimental,"4,700",nM,541.7,4.70E-06,—,—,
+Acetalax             ,—,—,Experimental,—,—,—,—,—,—,
+MG-132               ,10 mg/kg,IP,Experimental,—,—,475.6,—,—,—,
+Camptothecin         ,20,IV,Approved,"21,300",ng/mL,348.4,6.11E-05,"10,200",ng·h/mL,yes
+Staurosporine       ,—,—,Experimental,—,—,466.5,—,—,—,
+Nutlin-3a (-)       ,100 mg/kg,Oral,Experimental,~12.1,µg/mL,~581.5,2.08E-05,65,µg·h/mL,
+MK-2206              ,60 mg QOD,Oral,Investigational,277,nM,407.5,2.77E-07,"9,690",nM·h/mL,
+Palbociclib          ,125 mg,Oral,Approved,185.5,ng/mL,447.5,4.15E-07,"2,838",ng·h/mL,
+PD0325901           ,2 mg/m²,Oral,Investigational,152,ng/mL,482.19,3.15E-07,578,ng·h/mL,
+5-Fluorouracil       ,—,IV,Approved,—,—,—,—,—,—,
+Navitoclax         ,250 mg,Oral,Investigational,3.7,µg/mL,974.6,3.80E-06,61.2,µg·h/mL,
+Olaparib            ,300 mg BID,Oral,Approved,7.7,µg/mL,434.5,1.77E-05,49,µg·h/mL,
+PD173074            ,—,—,Experimental,—,—,—,—,—,—,
