@@ -73,193 +73,19 @@ st.subheader("💊 Drug Selection")
 drug_name = st.selectbox("Select a drug", all_drug_names)
 
 def prepare_user_data():
-    user_data={}
+    user_data = {}
+    submitted = False
 
-    st.subheader("🧪 Concentration Range")
-    col1, col2 = st.columns(2)
-
-    with col1:
-        min_concentration = st.number_input(
-            "Minimum concentration (µM)",
-            min_value=0.0001,
-            value=0.0001,
-            step=0.0001,
-            format="%.4f"
-        )
-
-    with col2:
-        max_concentration = st.number_input(
-            "Maximum concentration (µM)",
-            min_value=0.0001,
-            value=0.1,
-            step=0.01,
-            format="%.4f"
-        )
-
-    if max_concentration < min_concentration:
-        st.error("Maximum concentration must be greater than or equal to minimum concentration.")
-
-
-    st.subheader("👤 Patient Information")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-            ethnicity = st.selectbox(
-                "Ethnicity",
-                ["Arabic", "Black", "East Asian", "Other",
-                "South Asian", "Unknown", "White"]
-            )
-
-    with col2:
-            gender = st.selectbox(
-                "Gender",
-                ["Female", "Male", "Unknown"]
-            )
-
-    st.subheader("🧬 Gene mutations")
-    TP53_mutation_count = st.number_input("TP53 mutation count", min_value=0, step=1)
-    KRAS_mutation_count = st.number_input("KRAS mutation count", min_value=0, step=1)
-    KMT2C_mutation_count = st.number_input("KMT2C mutation count", min_value=0, step=1)
-    PTEN_mutation_count = st.number_input("PTEN mutation count", min_value=0, step=1)
-    KMT2D_mutation_count = st.number_input("KMT2D mutation count", min_value=0, step=1)
-    RB1_mutation_count = st.number_input("RB1 mutation count", min_value=0, step=1)
-
-    user_data["MIN_CONC"] = min_concentration
-    user_data["MAX_CONC"] = max_concentration
-    user_data["ethnicity"] = ethnicity
-    user_data["gender"] = gender
-    user_data["DRUG_NAME"] = drug_name
-
-    user_data["TP53_mutation_count"] = TP53_mutation_count
-    user_data["KRAS_mutation_count"] = KRAS_mutation_count
-    user_data["KMT2C_mutation_count"] = KMT2C_mutation_count
-    user_data["PTEN_mutation_count"] = PTEN_mutation_count
-    user_data["KMT2D_mutation_count"] = KMT2D_mutation_count
-    user_data["RB1_mutation_count"] = RB1_mutation_count
-
-    user_data["TP53_mutated"] = 1 if TP53_mutation_count > 0 else 0
-    user_data["KRAS_mutated"] = 1 if KRAS_mutation_count > 0 else 0
-    user_data["KMT2C_mutated"] =  1 if KMT2C_mutation_count > 0 else 0
-    user_data["PTEN_mutated"] = 1 if PTEN_mutation_count > 0 else 0
-    user_data["KMT2D_mutated"] = 1 if KMT2D_mutation_count > 0 else 0
-    user_data["RB1_mutated"] = 1 if RB1_mutation_count > 0 else 0
-
-    user_data["PATHWAY_NAME"] = drug_pathway.get(drug_name, "Other")
-
-    data_option = st.radio("Molecular data input", ["Use default values","Enter my own VAF and expression values", "Upload my own CSV or excel for multiple patients"])
-    
-    if data_option == "Enter my own VAF and expression values":
-        st.caption("VAF: enter values only when mutation count > 0.")
-        st.subheader("🧬 Molecular Data")
-
-        TP53_min_VAF = st.number_input( "TP53 minimum VAF",min_value=0.0, max_value=1.0,value=0.0, step=0.01)
-        TP53_max_VAF = st.number_input( "TP53 maximum VAF", min_value=0.0,max_value=1.0, value=0.0, step=0.01)
-        TP53_expression = st.number_input("TP53 expression", value=0.0,step=0.1)
-
-        KRAS_min_VAF = st.number_input( "KRAS minimum VAF",min_value=0.0, max_value=1.0,value=0.0, step=0.01)
-        KRAS_max_VAF = st.number_input( "KRAS maximum VAF", min_value=0.0,max_value=1.0, value=0.0, step=0.01)
-        KRAS_expression = st.number_input("KRAS expression", value=0.0,step=0.1)
-
-        KMT2C_min_VAF = st.number_input( "KMT2C minimum VAF",min_value=0.0, max_value=1.0,value=0.0, step=0.01)
-        KMT2C_max_VAF = st.number_input( "KMT2C maximum VAF", min_value=0.0,max_value=1.0, value=0.0, step=0.01)
-        KMT2C_expression = st.number_input("KMT2C expression", value=0.0,step=0.1)
-
-        PTEN_min_VAF = st.number_input( "PTEN minimum VAF",min_value=0.0, max_value=1.0,value=0.0, step=0.01)
-        PTEN_max_VAF = st.number_input( "PTEN maximum VAF", min_value=0.0,max_value=1.0, value=0.0, step=0.01)
-        PTEN_expression = st.number_input("PTEN expression", value=0.0,step=0.1)
-
-        KMT2D_min_VAF = st.number_input( "KMT2D minimum VAF",min_value=0.0, max_value=1.0,value=0.0, step=0.01)
-        KMT2D_max_VAF = st.number_input( "KMT2D maximum VAF", min_value=0.0,max_value=1.0, value=0.0, step=0.01)
-        KMT2D_expression = st.number_input("KMT2D expression", value=0.0,step=0.1)
-
-        RB1_min_VAF = st.number_input( "RB1 minimum VAF",min_value=0.0, max_value=1.0,value=0.0, step=0.01)
-        RB1_max_VAF = st.number_input( "RB1 maximum VAF", min_value=0.0,max_value=1.0, value=0.0, step=0.01)
-        RB1_expression = st.number_input("RB1 expression", value=0.0,step=0.1)
-
-        user_data["TP53_min_VAF"]= TP53_min_VAF
-        user_data["TP53_max_VAF"]= TP53_max_VAF
-        user_data["TP53_expression"]= TP53_expression
-
-        user_data["KRAS_min_VAF"] = KRAS_min_VAF
-        user_data["KRAS_max_VAF"]= KRAS_max_VAF
-        user_data["KRAS_expression"] = KRAS_expression
-
-        user_data["KMT2C_min_VAF"]= KMT2C_min_VAF
-        user_data["KMT2C_max_VAF"] = KMT2C_max_VAF
-        user_data["KMT2C_expression"] = KMT2C_expression
-
-        user_data["PTEN_min_VAF"] = PTEN_min_VAF
-        user_data["PTEN_max_VAF"]= PTEN_max_VAF
-        user_data["PTEN_expression"] = PTEN_expression
-
-        user_data["KMT2D_min_VAF"] = KMT2D_min_VAF
-        user_data["KMT2D_max_VAF"] = KMT2D_max_VAF
-        user_data["KMT2D_expression"] = KMT2D_expression
-
-
-        user_data["RB1_min_VAF"] = RB1_min_VAF
-        user_data["RB1_max_VAF"] = RB1_max_VAF
-        user_data["RB1_expression"] = RB1_expression
-        
-    elif data_option == "Use default values":
-    
-        if TP53_mutation_count > 0:
-            user_data["TP53_min_VAF"] = x_train["TP53_min_VAF"].median()
-            user_data["TP53_max_VAF"] = x_train["TP53_max_VAF"].median()
-        else:
-            user_data["TP53_min_VAF"] = 0
-            user_data["TP53_max_VAF"] = 0
-
-        if KRAS_mutation_count > 0:
-            user_data["KRAS_min_VAF"] = x_train["KRAS_min_VAF"].median()
-            user_data["KRAS_max_VAF"] = x_train["KRAS_max_VAF"].median()
-        else:
-            user_data["KRAS_max_VAF"] =0
-            user_data["KRAS_min_VAF"] = 0
-
-        if KMT2C_mutation_count>0:
-            user_data["KMT2C_min_VAF"] = x_train["KMT2C_min_VAF"].median()
-            user_data["KMT2C_max_VAF"] = x_train["KMT2C_max_VAF"].median()
-        else:
-            user_data["KMT2C_min_VAF"]=0
-            user_data["KMT2C_max_VAF"]=0
-
-        if PTEN_mutation_count>0:
-            user_data["PTEN_min_VAF"] = x_train["PTEN_min_VAF"].median()
-            user_data["PTEN_max_VAF"] = x_train["PTEN_max_VAF"].median()
-        else:
-            user_data["PTEN_min_VAF"]=0
-            user_data["PTEN_max_VAF"]=0
-
-        if KMT2D_mutation_count>0:
-            user_data["KMT2D_min_VAF"] = x_train["KMT2D_min_VAF"].median()
-            user_data["KMT2D_max_VAF"] = x_train["KMT2D_max_VAF"].median()
-        else:
-            user_data["KMT2D_min_VAF"]=0
-            user_data["KMT2D_max_VAF"]=0
-
-        if RB1_mutation_count>0:
-            user_data["RB1_min_VAF"] = x_train["RB1_min_VAF"].median()
-            user_data["RB1_max_VAF"] = x_train["RB1_max_VAF"].median()
-        else:
-            user_data["RB1_min_VAF"]=0
-            user_data["RB1_max_VAF"]=0
-
-        user_data["TP53_expression"] = x_train["TP53_expression"].median()
-        user_data["KRAS_expression"] = x_train["KRAS_expression"].median()
-        user_data["KMT2C_expression"] = x_train["KMT2C_expression"].median()
-        user_data["PTEN_expression"] = x_train["PTEN_expression"].median()
-        user_data["KMT2D_expression"] = x_train["KMT2D_expression"].median()
-        user_data["RB1_expression"] = x_train["RB1_expression"].median()
-
-    elif data_option== "Upload my own CSV or excel for multiple patients":
+    data_option = st.radio( "Molecular data input", [ "Use default values", "Enter my own VAF and expression values", "Upload my own CSV or excel for multiple patients" ] )
+    # CSV / Excel upload mode
+    if data_option == "Upload my own CSV or excel for multiple patients":
 
         st.subheader("📋 Patient Data Template")
 
         st.write(
             "Download a template, fill in your patient data, "
-            "and then upload the completed file below.")
+            "and then upload the completed file below."
+        )
 
         col1, col2 = st.columns(2)
 
@@ -269,7 +95,8 @@ def prepare_user_data():
                     label="📥 Download Excel Template",
                     data=file,
                     file_name="patient_input_template.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
 
         with col2:
             with open("patient_input_template.csv", "rb") as file:
@@ -277,24 +104,180 @@ def prepare_user_data():
                     label="📥 Download CSV Template",
                     data=file,
                     file_name="patient_input_template.csv",
-                    mime="text/csv")
+                    mime="text/csv"
+                )
 
         st.subheader("📤 Upload Completed Template")
 
         uploaded_file = st.file_uploader(
             "Upload your completed patient template",
-            type=["xlsx", "csv"])
-        
+            type=["xlsx", "csv"]
+        )
+
         if uploaded_file is not None:
-            if  uploaded_file.name.endswith(".xlsx"):
+
+            if uploaded_file.name.endswith(".xlsx"):
                 uploaded_df = pd.read_excel(uploaded_file)
 
-            elif uploaded_file.name.endswith(".csv"):
-                 uploaded_df = pd.read_csv(uploaded_file)
+            else:
+                uploaded_df = pd.read_csv(uploaded_file)
 
-            return uploaded_df
+            st.success("File uploaded successfully!")
 
-    return user_data
+            st.write("Preview of uploaded data:")
+            st.dataframe(uploaded_df)
+
+            submitted = st.button("Predict Drug Response")
+
+            return uploaded_df, submitted
+
+        return None, False
+
+# Single-patient input modes
+    elif data_option == "Use default values" or data_option == "Enter my own VAF and expression values":
+
+        with st.form("patient_input_form"):
+        
+            st.subheader("🧪 Concentration Range") 
+            col1, col2 = st.columns(2)
+
+            with col1: 
+                min_concentration = st.number_input( "Minimum concentration (µM)", min_value=0.0001, value=0.0001, step=0.0001, format="%.4f" )
+            with col2: 
+                max_concentration = st.number_input( "Maximum concentration (µM)", min_value=0.0001, value=0.1, step=0.01, format="%.4f" )
+            if max_concentration < min_concentration: 
+                st.error( "Maximum concentration must be greater than or equal " "to minimum concentration." )
+
+            st.subheader("👤 Patient Information")
+
+            col1, col2 = st.columns(2) 
+            with col1: 
+                ethnicity = st.selectbox( "Ethnicity", [ "Arabic", "Black", "East Asian", "Other", "South Asian", "Unknown", "White" ] )
+            with col2: 
+                gender = st.selectbox( "Gender", ["Female", "Male", "Unknown"] )
+
+            st.subheader("🧬 Gene mutations")
+            TP53_mutation_count = st.number_input( "TP53 mutation count", min_value=0, step=1 )
+            KRAS_mutation_count = st.number_input( "KRAS mutation count", min_value=0, step=1 )
+            KMT2C_mutation_count = st.number_input( "KMT2C mutation count", min_value=0, step=1 )
+            PTEN_mutation_count = st.number_input( "PTEN mutation count", min_value=0, step=1 )
+            KMT2D_mutation_count = st.number_input( "KMT2D mutation count", min_value=0, step=1 )
+            RB1_mutation_count = st.number_input( "RB1 mutation count", min_value=0, step=1 )
+
+        # Basic patient data
+
+            user_data["MIN_CONC"] = min_concentration 
+            user_data["MAX_CONC"] = max_concentration 
+            user_data["ethnicity"] = ethnicity 
+            user_data["gender"] = gender 
+            user_data["DRUG_NAME"] = drug_name 
+            user_data["TP53_mutation_count"] = TP53_mutation_count 
+            user_data["KRAS_mutation_count"] = KRAS_mutation_count 
+            user_data["KMT2C_mutation_count"] = KMT2C_mutation_count 
+            user_data["PTEN_mutation_count"] = PTEN_mutation_count
+            user_data["KMT2D_mutation_count"] = KMT2D_mutation_count 
+            user_data["RB1_mutation_count"] = RB1_mutation_count
+
+        # Mutation flags
+            user_data["TP53_mutated"] = ( 1 if TP53_mutation_count > 0 else 0 )
+            user_data["KRAS_mutated"] = ( 1 if KRAS_mutation_count > 0 else 0 )
+            user_data["KMT2C_mutated"] = ( 1 if KMT2C_mutation_count > 0 else 0 )
+            user_data["PTEN_mutated"] = ( 1 if PTEN_mutation_count > 0 else 0 ) 
+            user_data["KMT2D_mutated"] = ( 1 if KMT2D_mutation_count > 0 else 0 ) 
+            user_data["RB1_mutated"] = ( 1 if RB1_mutation_count > 0 else 0 )
+        # Drug pathway
+
+            user_data["PATHWAY_NAME"] = drug_pathway.get( drug_name, "Other" )
+        # Molecular data
+            if data_option == "Enter my own VAF and expression values":
+                st.caption( "VAF: enter values only when mutation count > 0." )
+                st.subheader("🧬 Molecular Data")
+                TP53_min_VAF = st.number_input( "TP53 minimum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                TP53_max_VAF = st.number_input( "TP53 maximum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                TP53_expression = st.number_input( "TP53 expression", value=0.0, step=0.1 )
+                KRAS_min_VAF = st.number_input( "KRAS minimum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                KRAS_max_VAF = st.number_input( "KRAS maximum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                KRAS_expression = st.number_input( "KRAS expression", value=0.0, step=0.1 )
+                KMT2C_min_VAF = st.number_input( "KMT2C minimum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                KMT2C_max_VAF = st.number_input( "KMT2C maximum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                KMT2C_expression = st.number_input( "KMT2C expression", value=0.0, step=0.1 )
+                PTEN_min_VAF = st.number_input( "PTEN minimum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                PTEN_max_VAF = st.number_input( "PTEN maximum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                PTEN_expression = st.number_input( "PTEN expression", value=0.0, step=0.1 )
+                KMT2D_min_VAF = st.number_input( "KMT2D minimum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                KMT2D_max_VAF = st.number_input( "KMT2D maximum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                KMT2D_expression = st.number_input( "KMT2D expression", value=0.0, step=0.1 )
+                RB1_min_VAF = st.number_input( "RB1 minimum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                RB1_max_VAF = st.number_input( "RB1 maximum VAF", min_value=0.0, max_value=1.0, value=0.0, step=0.01 )
+                RB1_expression = st.number_input( "RB1 expression", value=0.0, step=0.1 )
+                
+        # Save molecular values
+                user_data["TP53_min_VAF"] = TP53_min_VAF
+                user_data["TP53_max_VAF"] = TP53_max_VAF 
+                user_data["TP53_expression"] = TP53_expression 
+                user_data["KRAS_min_VAF"] = KRAS_min_VAF 
+                user_data["KRAS_max_VAF"] = KRAS_max_VAF
+                user_data["KRAS_expression"] = KRAS_expression 
+                user_data["KMT2C_min_VAF"] = KMT2C_min_VAF
+                user_data["KMT2C_max_VAF"] = KMT2C_max_VAF 
+                user_data["KMT2C_expression"] = KMT2C_expression 
+                user_data["PTEN_min_VAF"] = PTEN_min_VAF 
+                user_data["PTEN_max_VAF"] = PTEN_max_VAF 
+                user_data["PTEN_expression"] = PTEN_expression 
+                user_data["KMT2D_min_VAF"] = KMT2D_min_VAF 
+                user_data["KMT2D_max_VAF"] = KMT2D_max_VAF 
+                user_data["KMT2D_expression"] = KMT2D_expression 
+                user_data["RB1_min_VAF"] = RB1_min_VAF 
+                user_data["RB1_max_VAF"] = RB1_max_VAF 
+                user_data["RB1_expression"] = RB1_expression
+        # Default values
+            elif data_option == "Use default values":
+                if TP53_mutation_count > 0: 
+                        user_data["TP53_min_VAF"] = ( x_train["TP53_min_VAF"].median() )
+                        user_data["TP53_max_VAF"] = ( x_train["TP53_max_VAF"].median() ) 
+                else:
+                        user_data["TP53_min_VAF"] = 0 
+                        user_data["TP53_max_VAF"] = 0 
+                if KRAS_mutation_count > 0: 
+                        user_data["KRAS_min_VAF"] = ( x_train["KRAS_min_VAF"].median() ) 
+                        user_data["KRAS_max_VAF"] = ( x_train["KRAS_max_VAF"].median() )
+                else: 
+                        user_data["KRAS_min_VAF"] = 0 
+                        user_data["KRAS_max_VAF"] = 0 
+                if KMT2C_mutation_count > 0: 
+                    user_data["KMT2C_min_VAF"] = ( x_train["KMT2C_min_VAF"].median() ) 
+                    user_data["KMT2C_max_VAF"] = ( x_train["KMT2C_max_VAF"].median() ) 
+                else: 
+                    user_data["KMT2C_min_VAF"] = 0 
+                    user_data["KMT2C_max_VAF"] = 0 
+                if PTEN_mutation_count > 0: 
+                    user_data["PTEN_min_VAF"] = ( x_train["PTEN_min_VAF"].median() ) 
+                    user_data["PTEN_max_VAF"] = ( x_train["PTEN_max_VAF"].median() ) 
+                else: 
+                    user_data["PTEN_min_VAF"] = 0
+                    user_data["PTEN_max_VAF"] = 0 
+                if KMT2D_mutation_count > 0: 
+                    user_data["KMT2D_min_VAF"] = ( x_train["KMT2D_min_VAF"].median() ) 
+                    user_data["KMT2D_max_VAF"] = ( x_train["KMT2D_max_VAF"].median() ) 
+                else: 
+                    user_data["KMT2D_min_VAF"] = 0 
+                    user_data["KMT2D_max_VAF"] = 0 
+                if RB1_mutation_count > 0: 
+                    user_data["RB1_min_VAF"] = ( x_train["RB1_min_VAF"].median() ) 
+                    user_data["RB1_max_VAF"] = ( x_train["RB1_max_VAF"].median() ) 
+                else: 
+                    user_data["RB1_min_VAF"] = 0 
+                    user_data["RB1_max_VAF"] = 0
+                user_data["TP53_expression"] = ( x_train["TP53_expression"].median() ) 
+                user_data["KRAS_expression"] = ( x_train["KRAS_expression"].median() )
+                user_data["KMT2C_expression"] = ( x_train["KMT2C_expression"].median() ) 
+                user_data["PTEN_expression"] = ( x_train["PTEN_expression"].median() ) 
+                user_data["KMT2D_expression"] = ( x_train["KMT2D_expression"].median() ) 
+                user_data["RB1_expression"] = ( x_train["RB1_expression"].median() )
+
+        # Form submit button
+            submitted = st.form_submit_button( "Predict Drug Response" )
+        return user_data, submitted
 
 
     #conversion functions for LNIC50 
@@ -328,11 +311,14 @@ def compare_ic50_cmax(predicted_ic50, cmax):
     "  to evaluate the prediction over a different concentration range.")
 
 
-user_data = prepare_user_data()
+user_data, submitted = prepare_user_data()
 
-if isinstance(user_data, pd.DataFrame):
-    uploaded_df = user_data
-    # check the basic required columns 
+if user_data is None:
+    user_input = None
+
+elif isinstance(user_data, pd.DataFrame):
+    uploaded_df = user_data.copy()
+# check the basic required columns 
     required_columns = [
     "patient_id",
     "DRUG_NAME",
@@ -502,32 +488,62 @@ if isinstance(user_data, pd.DataFrame):
         st.stop()
 
     user_input = uploaded_df.copy()
+
 else:
     user_input = pd.DataFrame([user_data])
 
     
-user_input["PATHWAY_NAME"] = user_input["DRUG_NAME"].map(drug_pathway).fillna("Other")
+if user_input is not None:
 
-user_input = pd.get_dummies(
-    user_input,
-    columns=["ethnicity", "gender", "DRUG_NAME", "PATHWAY_NAME"],
-    dtype=int
-)
+    user_input["PATHWAY_NAME"] = (
+        user_input["DRUG_NAME"]
+        .map(drug_pathway)
+        .fillna("Other")
+    )
 
-user_input = user_input.reindex(
-    columns=feature_columns,
-    fill_value=0
-)
+    user_input = pd.get_dummies(
+        user_input,
+        columns=["ethnicity", "gender", "DRUG_NAME", "PATHWAY_NAME"],
+        dtype=int
+    )
 
-if st.button("Predict Drug Response"):
-    LN_IC50 =  model.predict(user_input)[0]
+    user_input = user_input.reindex(
+        columns=feature_columns,
+        fill_value=0
+    )
+
+if submitted and user_input is not None:
+    LN_IC50 = model.predict(user_input)
     predicted_ic50 = conversion(LN_IC50)
 
+    # Multiple patients uploaded
+    if isinstance(user_data, pd.DataFrame):
 
-    st.subheader("Prediction Results")
+        results = pd.DataFrame({
+            "patient_id": user_data["patient_id"],
+            "Predicted LN_IC50": LN_IC50,
+            "Predicted IC50 (M)": predicted_ic50
+        })
 
-    st.write(f"Predicted LN_IC50: {LN_IC50:.3f}")
-    st.write(f"Predicted IC50: {predicted_ic50:.3e} M")
+        st.subheader("Prediction Results")
+
+        st.dataframe(results)
+   # Single patient
+    else:
+
+        LN_IC50_single = LN_IC50[0]
+        predicted_ic50_single = predicted_ic50[0]
+
+        st.subheader("Prediction Results")
+
+        st.write(
+            f"Predicted LN_IC50: {LN_IC50_single:.3f}"
+        )
+
+        st.write(
+            f"Predicted IC50: {predicted_ic50_single:.3e} M"
+        )
+    
 
     # Check whether clinical Cmax is available
 
