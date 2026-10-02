@@ -19,14 +19,20 @@ st.markdown(
 )
 
 # load the model
-with open("XGboost_LN_IC50_cancer_drug_prediction.sav", "rb") as file:
-    model = load(file)
+@st.cache_resource
+def load_model():
+    with open("XGboost_LN_IC50_cancer_drug_prediction.sav", "rb") as file:
+        return load(file)
 
-with open("feature_columns.pkl", "rb") as file:
-    feature_columns = load(file)
+@st.cache_resource
+def load_feature_columns():
+    with open("feature_columns.pkl", "rb") as file:
+        return load(file)
 
+model = load_model()
+feature_columns = load_feature_columns()
 
-    # load reference_drug into the app
+# load reference_drug into the app
 @st.cache_data
 def load_reference_drugs():
         return pd.read_csv("20 drugs Pk.csv")
@@ -47,11 +53,19 @@ reference_drug["Name"] = (
 
 # load x_train
 x_train= load_x_train()
+
 x_train["DRUG_NAME"] = (
     x_train["DRUG_NAME"]
     .astype(str)
     .str.strip()
 )
+
+# Create drug → pathway lookup
+drug_pathway = (
+    x_train.drop_duplicates("DRUG_NAME")
+    .set_index("DRUG_NAME")["PATHWAY_NAME"]
+)
+
 all_drug_names = sorted(x_train["DRUG_NAME"].dropna().unique())
 
 st.subheader("💊 Drug Selection")
@@ -131,13 +145,7 @@ def prepare_user_data():
     user_data["KMT2D_mutated"] = 1 if KMT2D_mutation_count > 0 else 0
     user_data["RB1_mutated"] = 1 if RB1_mutation_count > 0 else 0
 
-    pathway = x_train.loc[
-    x_train["DRUG_NAME"] == drug_name,
-    "PATHWAY_NAME"]
-    if len(pathway) > 0:
-        user_data["PATHWAY_NAME"] = pathway.iloc[0]
-    else:
-        user_data["PATHWAY_NAME"] = "Other"
+    user_data["PATHWAY_NAME"] = drug_pathway.get(drug_name, "Other")
 
     data_option = st.radio("Molecular data input", ["Use default values","Enter my own VAF and expression values", "Upload my own CSV or excel for multiple patients"])
     
@@ -498,8 +506,7 @@ else:
     user_input = pd.DataFrame([user_data])
 
     
-user_input["PATHWAY_NAME"] = user_input["DRUG_NAME"].map(
-    x_train.drop_duplicates("DRUG_NAME").set_index("DRUG_NAME")["PATHWAY_NAME"]).fillna("Other")
+user_input["PATHWAY_NAME"] = user_input["DRUG_NAME"].map(drug_pathway).fillna("Other")
 
 user_input = pd.get_dummies(
     user_input,
