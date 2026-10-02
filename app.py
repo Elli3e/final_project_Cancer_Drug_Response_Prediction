@@ -68,10 +68,6 @@ drug_pathway = (
 
 all_drug_names = sorted(x_train["DRUG_NAME"].dropna().unique())
 
-st.subheader("💊 Drug Selection")
-
-drug_name = st.selectbox("Select a drug", all_drug_names)
-
 def prepare_user_data():
     user_data = {}
     submitted = False
@@ -129,12 +125,15 @@ def prepare_user_data():
 
             submitted = st.button("Predict Drug Response")
 
-            return uploaded_df, submitted
+            return uploaded_df, submitted, None
 
-        return None, False
+        return None, False, None
 
 # Single-patient input modes
     elif data_option == "Use default values" or data_option == "Enter my own VAF and expression values":
+        st.subheader("💊 Drug Selection")
+
+        drug_name = st.selectbox("Select a drug", all_drug_names)
 
         with st.form("patient_input_form"):
         
@@ -277,7 +276,7 @@ def prepare_user_data():
 
         # Form submit button
             submitted = st.form_submit_button( "Predict Drug Response" )
-        return user_data, submitted
+        return user_data, submitted, drug_name
 
 
     #conversion functions for LNIC50 
@@ -311,7 +310,7 @@ def compare_ic50_cmax(predicted_ic50, cmax):
     "  to evaluate the prediction over a different concentration range.")
 
 
-user_data, submitted = prepare_user_data()
+user_data, submitted, drug_name = prepare_user_data()
 
 if user_data is None:
     user_input = None
@@ -521,6 +520,7 @@ if submitted and user_input is not None:
 
         results = pd.DataFrame({
             "patient_id": user_data["patient_id"],
+            "DRUG_NAME": user_data["DRUG_NAME"],
             "Predicted LN_IC50": LN_IC50,
             "Predicted IC50 (M)": predicted_ic50
         })
@@ -528,64 +528,105 @@ if submitted and user_input is not None:
         st.subheader("Prediction Results")
 
         st.dataframe(results)
+              # Clinical Cmax comparison for each uploaded patient
+        for i, row in user_data.iterrows():
+
+            drug_name_upload = row["DRUG_NAME"]
+
+            drug_match = reference_drug[
+                reference_drug["Name"].astype(str).str.strip()
+                == str(drug_name_upload).strip()
+            ]
+
+            if len(drug_match) > 0:
+                drug_info = drug_match.iloc[0]
+
+                cmax = pd.to_numeric(
+                    drug_info["Cmax_M"],
+                    errors="coerce"
+                )
+
+                if pd.notna(cmax):
+                    st.subheader(
+                        f"Clinical Drug Information — {row['patient_id']}"
+                    )
+
+                    st.write("Drug:", drug_name_upload)
+                    st.write("Clinical status:", drug_info["Clinical_status"])
+                    st.write("Dose:", drug_info["dose"])
+                    st.write("Route:", drug_info["route"])
+                    st.write(
+                        "Cmax:",
+                        drug_info["Cmax"],
+                        drug_info["Cmax_unit"]
+                    )
+                    st.write("Cmax (M):", cmax)
+
+                    compare_ic50_cmax(
+                        predicted_ic50[i],
+                        cmax
+                    )
+
+                else:
+                    st.info(
+                        f"Clinical Cmax information is not available "
+                        f"for {drug_name_upload}."
+                    )
+
+            else:
+                st.info(
+                    f"Clinical Cmax information is not available "
+                    f"for {drug_name_upload}."
+                )
+
    # Single patient
     else:
 
         LN_IC50_single = LN_IC50[0]
         predicted_ic50_single = predicted_ic50[0]
 
+        predicted_ic50 = predicted_ic50_single
+
         st.subheader("Prediction Results")
+        st.write(f"Predicted LN_IC50: {LN_IC50_single:.3f}")
+        st.write(f"Predicted IC50: {predicted_ic50_single:.3e} M")
 
-        st.write(
-            f"Predicted LN_IC50: {LN_IC50_single:.3f}"
-        )
+        # Clinical Cmax comparison for single patient
+        drug_match = reference_drug[
+            reference_drug["Name"].astype(str).str.strip()
+            == drug_name.strip()
+        ]
 
-        st.write(
-            f"Predicted IC50: {predicted_ic50_single:.3e} M"
-        )
-    
+        if len(drug_match) > 0:
 
-    # Check whether clinical Cmax is available
+            drug_info = drug_match.iloc[0]
 
-    drug_match = reference_drug[
-    reference_drug["Name"].astype(str).str.strip()
-    == drug_name.strip()]
+            cmax = pd.to_numeric(
+                drug_info["Cmax_M"],
+                errors="coerce"
+            )
 
-    if len(drug_match) > 0 and pd.notna(drug_match.iloc[0]["Cmax_M"]):
+            if pd.notna(cmax):
 
-        drug_info = drug_match.iloc[0]
-        cmax = drug_info["Cmax_M"]
+                st.subheader("Clinical Drug Information")
+                st.write("Clinical status:", drug_info["Clinical_status"])
+                st.write("Dose:", drug_info["dose"])
+                st.write("Route:", drug_info["route"])
+                st.write("Cmax:", drug_info["Cmax"], drug_info["Cmax_unit"])
+                st.write("Cmax (M):", cmax)
 
-        st.subheader("Clinical Drug Information")
+                compare_ic50_cmax(predicted_ic50, cmax)
 
-        st.write(
-            "Clinical status:",
-            drug_info["Clinical_status"]
-        )
-        st.write(
-            "Dose:",
-            drug_info["dose"]
-        )
-        st.write(
-            "Route:",
-            drug_info["route"]
-        )
-        st.write(
-            "Cmax:",
-            drug_info["Cmax"],
-            drug_info["Cmax_unit"]
-        )
+            else:
+                st.info(
+                    "Reference clinical Cmax information is not available "
+                    "for this drug, so a clinical Cmax comparison cannot be performed."
+                )
 
-        st.write("Cmax (M):", cmax)
-
-        compare_ic50_cmax(predicted_ic50, cmax)
-
-    else:
-
-        st.info(
-            "Reference clinical Cmax information is not available "
-            "for this drug, so a clinical Cmax comparison cannot be performed."
-        )
-
+        else:
+            st.info(
+                "Reference clinical Cmax information is not available "
+                "for this drug, so a clinical Cmax comparison cannot be performed."
+            )
 
         
