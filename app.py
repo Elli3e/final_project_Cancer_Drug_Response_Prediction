@@ -27,28 +27,14 @@ with open("feature_columns.pkl", "rb") as file:
 
 
     # load reference_drug into the app
-DB_PATH = "app_database.db"
 @st.cache_data
 def load_reference_drugs():
-        conn = sqlite3.connect(DB_PATH)
-        query = """
-        SELECT *
-        FROM reference_drug
-        """
-        reference_drug = pd.read_sql_query(query, conn)
-        conn.close()
-        return reference_drug
+        return pd.read_csv("20 drugs Pk.csv")
 
 @st.cache_data
 def load_x_train():
-    conn = sqlite3.connect(DB_PATH)
-    query = """
-    SELECT *
-    FROM x_train
-    """
-    x_train = pd.read_sql_query(query, conn)
-    conn.close()
-    return x_train
+
+    return pd.read_csv("x_train.csv")
 
 # Select reference drug
 reference_drug= load_reference_drugs()

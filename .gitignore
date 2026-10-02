@@ -7,10 +7,10 @@ cell_passport_database.db
 *.parquet
 
 # Keep the app's required files
+!x_train.csv
 !patient_input_template.csv
 !patient_input_template.xlsx
 !20 drugs Pk.csv
-
 
 # Python
 __pycache__/
